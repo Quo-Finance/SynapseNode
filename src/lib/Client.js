@@ -16,13 +16,14 @@ const {
   getCryptoMarketData,
   getWebhookLogs,
   getTradeMarketData,
-  verifyAddress
-} = require('../constants/apiReqNames');
+  verifyAddress,
+  getClient,
+} = require("../constants/apiReqNames");
 
-const apiRequests = require('../apiReqs/apiRequests');
-const buildHeaders = require('../helpers/buildHeaders');
-const { checkOptions, instantiateUser } = require('../helpers/clientHelpers');
-const User = require('./User');
+const apiRequests = require("../apiReqs/apiRequests");
+const buildHeaders = require("../helpers/buildHeaders");
+const { checkOptions, instantiateUser } = require("../helpers/clientHelpers");
+const User = require("./User");
 
 class Client {
   constructor({
@@ -30,15 +31,22 @@ class Client {
     client_secret,
     fingerprint,
     ip_address,
-    isProduction
+    isProduction,
   }) {
     this.client_id = client_id;
     this.client_secret = client_secret;
     this.fingerprint = fingerprint;
     this.ip_address = ip_address;
     this.isProduction = isProduction;
-    this.host = isProduction ? 'https://api.synapsefi.com/v3.1' : 'https://uat-api.synapsefi.com/v3.1';
-    this.headers = buildHeaders({ client_id, client_secret, fingerprint, ip_address });
+    this.host = isProduction
+      ? "https://api.synapsefi.com/v3.1"
+      : "https://uat-api.synapsefi.com/v3.1";
+    this.headers = buildHeaders({
+      client_id,
+      client_secret,
+      fingerprint,
+      ip_address,
+    });
   }
 
   // POST CREATE USER
@@ -47,7 +55,7 @@ class Client {
       client_id: this.client_id,
       client_secret: this.client_secret,
       fingerprint: this.fingerprint,
-      ip_address
+      ip_address,
     };
 
     if (options) {
@@ -59,7 +67,7 @@ class Client {
     const { data } = await apiRequests.client[createUser]({
       bodyParams,
       headers,
-      clientInfo: this
+      clientInfo: this,
     });
 
     return instantiateUser({ data, headerObj, client: this });
@@ -74,7 +82,7 @@ class Client {
       page,
       per_page,
       show_refresh_tokens,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -85,7 +93,7 @@ class Client {
       client_secret: this.client_secret,
       fingerprint: this.fingerprint,
       ip_address: this.ip_address,
-      full_dehydrate: false
+      full_dehydrate: false,
     };
 
     if (options) {
@@ -98,7 +106,7 @@ class Client {
       user_id,
       full_dehydrate: headerObj.full_dehydrate,
       headers,
-      clientInfo: this
+      clientInfo: this,
     });
 
     return instantiateUser({ data, headerObj, client: this });
@@ -112,7 +120,7 @@ class Client {
       page,
       per_page,
       filter,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -124,42 +132,68 @@ class Client {
       page,
       per_page,
       filter,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
   // GET INSTITUTIONS
   getInstitutions() {
     return apiRequests.client[getInstitutions]({
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
   // GET ISSUE PUBLIC KEY
-  issuePublicKey(scope = ['OAUTH|POST', 'USERS|POST', 'USERS|GET', 'USER|GET', 'USER|PATCH', 'SUBSCRIPTIONS|GET', 'SUBSCRIPTIONS|POST', 'SUBSCRIPTION|GET', 'SUBSCRIPTION|PATCH', 'CLIENT|REPORTS', 'CLIENT|CONTROLS'], userId = null) {
+  issuePublicKey(
+    scope = [
+      "OAUTH|POST",
+      "USERS|POST",
+      "USERS|GET",
+      "USER|GET",
+      "USER|PATCH",
+      "SUBSCRIPTIONS|GET",
+      "SUBSCRIPTIONS|POST",
+      "SUBSCRIPTION|GET",
+      "SUBSCRIPTION|PATCH",
+      "CLIENT|REPORTS",
+      "CLIENT|CONTROLS",
+    ],
+    userId = null
+  ) {
     return apiRequests.client[issuePublicKey]({
       scope,
       clientInfo: this,
-      userId
+      userId,
     });
   }
 
   // POST CREATE SUBSCRIPTION
-  createSubscription(url, scope = ['USERS|POST', 'USER|PATCH', 'NODES|POST', 'NODE|PATCH', 'TRANS|POST', 'TRAN|PATCH'], idempotency_key = null) {
+  createSubscription(
+    url,
+    scope = [
+      "USERS|POST",
+      "USER|PATCH",
+      "NODES|POST",
+      "NODE|PATCH",
+      "TRANS|POST",
+      "TRAN|PATCH",
+    ],
+    idempotency_key = null
+  ) {
     if (idempotency_key) {
       this.headers = buildHeaders({
         client_id: this.client_id,
         client_secret: this.client_secret,
         fingerprint: this.fingerprint,
         ip_address: this.ip_address,
-        idempotency_key
+        idempotency_key,
       });
     }
 
     return apiRequests.client[createSubscription]({
       url,
       scope,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -170,7 +204,7 @@ class Client {
     return apiRequests.client[getAllSubscriptions]({
       page,
       per_page,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -178,7 +212,7 @@ class Client {
   getSubscription(subscription_id) {
     return apiRequests.client[getSubscription]({
       subscription_id,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -187,7 +221,7 @@ class Client {
     return apiRequests.client[updateSubscription]({
       subscription_id,
       bodyParams,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -202,28 +236,34 @@ class Client {
       radius,
       lat,
       lon,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
   // GET Verify Address
-    verifyAddress(queryParams = {}) {
-      const { address_city, address_country_code, address_postal_code, address_street, address_subdivision } = queryParams;
+  verifyAddress(queryParams = {}) {
+    const {
+      address_city,
+      address_country_code,
+      address_postal_code,
+      address_street,
+      address_subdivision,
+    } = queryParams;
 
-      return apiRequests.client[verifyAddress]({
-        address_city,
-        address_country_code,
-        address_postal_code,
-        address_street,
-        address_subdivision,
-        clientInfo: this
-      });
-    }
+    return apiRequests.client[verifyAddress]({
+      address_city,
+      address_country_code,
+      address_postal_code,
+      address_street,
+      address_subdivision,
+      clientInfo: this,
+    });
+  }
 
   // GET CRYPTO QUOTES
   getCryptoQuotes() {
     return apiRequests.client[getCryptoQuotes]({
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -234,14 +274,14 @@ class Client {
     return apiRequests.client[getCryptoMarketData]({
       limit,
       currency,
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
   // GET WEBHOOK LOGS
   getWebhookLogs() {
     return apiRequests.client[getWebhookLogs]({
-      clientInfo: this
+      clientInfo: this,
     });
   }
 
@@ -251,7 +291,13 @@ class Client {
 
     return apiRequests.client[getTradeMarketData]({
       ticker,
-      clientInfo: this
+      clientInfo: this,
+    });
+  }
+
+  getClient() {
+    return apiRequests.client[getClient]({
+      clientInfo: this,
     });
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "synapsenode",
+  "name": "@quo/synapsenode",
   "version": "1.2.11",
   "description": "Node.js Library for SynapseFI API v3.1 Rest",
   "main": "dist/index.js",
@@ -12,7 +12,8 @@
     "build": "babel src -d dist",
     "clean": "rm -rf dist",
     "dist": "npm run clean && npm run build",
-    "push": "npm run clean && npm run build && npm publish"
+    "push": "npm run clean && npm run build && npm publish",
+    "copy": "npm run clean && npm run build && rm -rf ~/code/quo-backend/functions/node_modules/synapsenode/dist && cp -r ./dist ~/code/quo-backend/functions/node_modules/synapsenode/dist"
   },
   "keywords": [
     "API",

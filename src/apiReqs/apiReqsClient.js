@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require("axios");
 
 const {
   createUser,
@@ -17,16 +17,13 @@ const {
   getCryptoMarketData,
   getWebhookLogs,
   getTradeMarketData,
-  verifyAddress
-} = require('../constants/apiReqNames');
+  verifyAddress,
+  getClient,
+} = require("../constants/apiReqNames");
 
-const { addQueryParams, replacePathParams } = require('../helpers/buildUrls');
+const { addQueryParams, replacePathParams } = require("../helpers/buildUrls");
 
-module.exports[createUser] = ({
-  bodyParams,
-  headers,
-  clientInfo
-}) => {
+module.exports[createUser] = ({ bodyParams, headers, clientInfo }) => {
   const { host } = clientInfo;
 
   // WILL NEED TO IMPLEMENT STATIC ENDPOINTS
@@ -38,7 +35,7 @@ module.exports[getAllUsers] = ({
   page,
   per_page,
   show_refresh_tokens,
-  clientInfo
+  clientInfo,
 }) => {
   const { host, headers } = clientInfo;
 
@@ -49,22 +46,34 @@ module.exports[getAllUsers] = ({
       query,
       page,
       per_page,
-      show_refresh_tokens
+      show_refresh_tokens,
     }),
     { headers }
   );
 };
 
-module.exports[getUser] = ({ user_id, full_dehydrate, headers, clientInfo }) => {
+module.exports[getUser] = ({
+  user_id,
+  full_dehydrate,
+  headers,
+  clientInfo,
+}) => {
   const { host } = clientInfo;
   // REFACTOR TO USE ADD_QUERY_PARAMS
-  const url = `${host}/users/${user_id}?full_dehydrate=${full_dehydrate ? 'yes' : 'no'}`;
+  const url = `${host}/users/${user_id}?full_dehydrate=${
+    full_dehydrate ? "yes" : "no"
+  }`;
 
   // REFACTOR TO USE REPLACE_PATH_PARAMS
   return axios.get(url, { headers });
 };
 
-module.exports[getPlatformTransactions] = ({ page, per_page, filter, clientInfo }) => {
+module.exports[getPlatformTransactions] = ({
+  page,
+  per_page,
+  filter,
+  clientInfo,
+}) => {
   const { host, headers } = clientInfo;
 
   return axios.get(
@@ -73,7 +82,7 @@ module.exports[getPlatformTransactions] = ({ page, per_page, filter, clientInfo 
       originalUrl: `${host}/trans`,
       page,
       per_page,
-      filter
+      filter,
     }),
     { headers }
   );
@@ -86,7 +95,7 @@ module.exports[getPlatformNodes] = ({ page, per_page, filter, clientInfo }) => {
     originalUrl: `${host}/nodes`,
     page,
     per_page,
-    filter
+    filter,
   });
 
   return axios.get(url, { headers });
@@ -94,7 +103,7 @@ module.exports[getPlatformNodes] = ({ page, per_page, filter, clientInfo }) => {
 
 module.exports[getInstitutions] = ({ clientInfo }) => {
   const { host, headers } = clientInfo;
-  const url = `${host}/institutions`
+  const url = `${host}/institutions`;
 
   return axios.get(url, { headers });
 };
@@ -102,8 +111,8 @@ module.exports[getInstitutions] = ({ clientInfo }) => {
 module.exports[issuePublicKey] = ({ scope, clientInfo, userId }) => {
   const { host, headers } = clientInfo;
   let url = `${host}/client?issue_public_key=yes&scope=${scope.join()}`;
-  if(userId) {
-    url += `&user_id=${userId}`
+  if (userId) {
+    url += `&user_id=${userId}`;
   }
 
   return axios.get(url, { headers });
@@ -123,7 +132,7 @@ module.exports[getAllSubscriptions] = ({ page, per_page, clientInfo }) => {
     // STATIC ENDPOINT?
     originalUrl: `${host}/subscriptions`,
     page,
-    per_page
+    per_page,
   });
 
   return axios.get(url, { headers });
@@ -136,7 +145,11 @@ module.exports[getSubscription] = ({ subscription_id, clientInfo }) => {
   return axios.get(url, { headers });
 };
 
-module.exports[updateSubscription] = ({ subscription_id, bodyParams, clientInfo}) => {
+module.exports[updateSubscription] = ({
+  subscription_id,
+  bodyParams,
+  clientInfo,
+}) => {
   const { host, headers } = clientInfo;
   const url = `${host}/subscriptions/${subscription_id}`;
   // CHECK IF VALID BODY PARAMS???
@@ -145,7 +158,15 @@ module.exports[updateSubscription] = ({ subscription_id, bodyParams, clientInfo}
   return axios.patch(url, reqBody, { headers });
 };
 
-module.exports[locateAtms] = ({ page, per_page, zip, radius, lat, lon, clientInfo }) => {
+module.exports[locateAtms] = ({
+  page,
+  per_page,
+  zip,
+  radius,
+  lat,
+  lon,
+  clientInfo,
+}) => {
   const { host, headers } = clientInfo;
   const url = addQueryParams({
     originalUrl: `${host}/nodes/atms`,
@@ -154,15 +175,28 @@ module.exports[locateAtms] = ({ page, per_page, zip, radius, lat, lon, clientInf
     zip,
     radius,
     lat,
-    lon
+    lon,
   });
 
   return axios.get(url, { headers });
 };
 
-module.exports[verifyAddress] = ({ address_city, address_country_code, address_postal_code, address_street, address_subdivision, clientInfo }) => {
+module.exports[verifyAddress] = ({
+  address_city,
+  address_country_code,
+  address_postal_code,
+  address_street,
+  address_subdivision,
+  clientInfo,
+}) => {
   const { host, headers } = clientInfo;
-  const reqBody = { address_city, address_country_code, address_postal_code, address_street, address_subdivision };
+  const reqBody = {
+    address_city,
+    address_country_code,
+    address_postal_code,
+    address_street,
+    address_subdivision,
+  };
   const baseUrl = `${host}/address-verification`;
 
   return axios.post(baseUrl, reqBody, { headers });
@@ -180,7 +214,7 @@ module.exports[getCryptoMarketData] = ({ limit, currency, clientInfo }) => {
   const url = addQueryParams({
     originalUrl: `${host}/nodes/crypto-market-watch`,
     limit,
-    currency
+    currency,
   });
 
   return axios.get(url, { headers });
@@ -197,8 +231,15 @@ module.exports[getTradeMarketData] = ({ ticker, clientInfo }) => {
   const { host, headers } = clientInfo;
   const url = addQueryParams({
     originalUrl: `${host}/nodes/trade-market-watch`,
-    ticker
+    ticker,
   });
+
+  return axios.get(url, { headers });
+};
+
+module.exports[getClient] = ({ clientInfo }) => {
+  const { host, headers } = clientInfo;
+  let url = `${host}/client?scope=CLIENT|REPORTS,CLIENT|CONTROLS`;
 
   return axios.get(url, { headers });
 };
