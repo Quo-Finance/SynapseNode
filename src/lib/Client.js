@@ -73,9 +73,9 @@ class Client {
       });
       this.axiosClient = axios.create({
         baseURL: this.host,
-        proxy: false,
         httpsAgent: this.tunnelingAgent,
       });
+      console.log("PROXYING TO VGS");
     }
   }
 
