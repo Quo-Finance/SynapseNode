@@ -26,6 +26,10 @@ const { addQueryParams, replacePathParams } = require("../helpers/buildUrls");
 module.exports[createUser] = ({ bodyParams, headers, clientInfo }) => {
   const { host } = clientInfo;
 
+  if (clientInfo.useVGS) {
+    return clientInfo.axiosClient.post("/users", bodyParams, { headers });
+  }
+
   // WILL NEED TO IMPLEMENT STATIC ENDPOINTS
   return axios.post(`${host}/users`, bodyParams, { headers });
 };

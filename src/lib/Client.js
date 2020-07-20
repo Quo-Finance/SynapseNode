@@ -24,6 +24,14 @@ const apiRequests = require("../apiReqs/apiRequests");
 const buildHeaders = require("../helpers/buildHeaders");
 const { checkOptions, instantiateUser } = require("../helpers/clientHelpers");
 const User = require("./User");
+const tunnel = require("tunnel");
+const axios = require("axios");
+
+/**
+ * NODE_TLS_REJECT_UNAUTHORIZED used to allow self signed certificate
+ * setting it to 0 on live environments is insecure
+ */
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 class Client {
   constructor({
@@ -32,6 +40,10 @@ class Client {
     fingerprint,
     ip_address,
     isProduction,
+    useVGS,
+    vgsUsername,
+    vgsPassword,
+    vgsCert,
   }) {
     this.client_id = client_id;
     this.client_secret = client_secret;
@@ -47,6 +59,22 @@ class Client {
       fingerprint,
       ip_address,
     });
+    if (useVGS) {
+      this.useVGS = true;
+      this.tunnelingAgent = tunnel.httpsOverHttp({
+        proxy: {
+          host: "tnta3dxgcev.sandbox.verygoodproxy.com",
+          port: 8080,
+          proxyAuth: vgsUsername + ":" + vgsPassword,
+        },
+        ca: [vgsCert],
+      });
+      this.axiosClient = axios.create({
+        baseURL: this.host,
+        proxy: false,
+        httpsAgent: this.tunnelingAgent,
+      });
+    }
   }
 
   // POST CREATE USER
