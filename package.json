@@ -1,6 +1,6 @@
 {
   "name": "@quo-finance/synapsenode",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "description": "Node.js Library for SynapseFI API v3.1 Rest",
   "main": "dist/index.js",
   "files": [
