@@ -63,7 +63,9 @@ class Client {
       this.useVGS = true;
       this.tunnelingAgent = tunnel.httpsOverHttp({
         proxy: {
-          host: "tnta3dxgcev.sandbox.verygoodproxy.com",
+          host: this.isProduction
+            ? ""
+            : "tnta3dxgcev.sandbox.verygoodproxy.com",
           port: 8080,
           proxyAuth: vgsUsername + ":" + vgsPassword,
         },

@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require("axios");
 
 const {
   addUserKyc,
@@ -35,10 +35,10 @@ const {
   shipCard,
   registerNewFingerprint,
   supplyDevice2FA,
-  verifyFingerprint2FA
-} = require('../constants/apiReqNames');
+  verifyFingerprint2FA,
+} = require("../constants/apiReqNames");
 
-const { addQueryParams, replacePathParams } = require('../helpers/buildUrls');
+const { addQueryParams, replacePathParams } = require("../helpers/buildUrls");
 
 module.exports[addUserKyc] = ({ bodyParams, userInfo }) => {
   const { host, headers, id } = userInfo;
@@ -54,6 +54,12 @@ module.exports[deleteExistingDocument] = ({ bodyParams, userInfo }) => {
 
 module.exports[updateUser] = ({ bodyParams, userInfo }) => {
   const { host, headers, id } = userInfo;
+
+  if (userInfo.client.useVGS) {
+    return userInfo.client.axiosClient.patch(`/users/${id}`, bodyParams, {
+      headers,
+    });
+  }
 
   return axios.patch(`${host}/users/${id}`, bodyParams, { headers });
 };
@@ -71,13 +77,13 @@ module.exports[createNode] = ({ bodyParams, userInfo }) => {
 };
 
 module.exports[verifyAchMfa] = ({ access_token, mfa_answer, userInfo }) => {
-  const { host, headers, id} = userInfo;
+  const { host, headers, id } = userInfo;
 
   return axios.post(
     `${host}/users/${id}/nodes`,
     {
       access_token,
-      mfa_answer
+      mfa_answer,
     },
     { headers }
   );
@@ -89,37 +95,55 @@ module.exports[getAllUserNodes] = ({ page, per_page, type, userInfo }) => {
     originalUrl: `${host}/users/${id}/nodes`,
     page,
     per_page,
-    type
+    type,
   });
 
   return axios.get(url, { headers });
 };
 
-module.exports[getNode] = ({ node_id, full_dehydrate, force_refresh, userInfo }) => {
+module.exports[getNode] = ({
+  node_id,
+  full_dehydrate,
+  force_refresh,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = addQueryParams({
     originalUrl: `${host}/users/${id}/nodes/${node_id}`,
     full_dehydrate,
-    force_refresh
+    force_refresh,
   });
 
   return axios.get(url, { headers });
 };
 
-module.exports[getUserTransactions] = ({ page, per_page, filter, userInfo }) => {
+module.exports[getUserTransactions] = ({
+  page,
+  per_page,
+  filter,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = addQueryParams({
     // STATIC ENDPOINT
     originalUrl: `${host}/users/${id}/trans`,
     page,
     per_page,
-    filter
+    filter,
   });
 
   return axios.get(url, { headers });
 };
 
-module.exports[triggerDummyTransactions] = ({ node_id, amount, foreign_transaction, is_credit, subnet_id, type, userInfo }) => {
+module.exports[triggerDummyTransactions] = ({
+  node_id,
+  amount,
+  foreign_transaction,
+  is_credit,
+  subnet_id,
+  type,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = addQueryParams({
     originalUrl: `${host}/users/${id}/nodes/${node_id}/dummy-tran`,
@@ -127,7 +151,7 @@ module.exports[triggerDummyTransactions] = ({ node_id, amount, foreign_transacti
     foreign_transaction,
     is_credit,
     subnet_id,
-    type
+    type,
   });
 
   return axios.get(url, { headers });
@@ -145,18 +169,23 @@ module.exports[getStatementsByUser] = ({ page, per_page, userInfo }) => {
   const url = addQueryParams({
     originalUrl: `${host}/users/${id}/statements`,
     page,
-    per_page
+    per_page,
   });
 
   return axios.get(url, { headers });
 };
 
-module.exports[getStatementsByNode] = ({ node_id, page, per_page, userInfo }) => {
+module.exports[getStatementsByNode] = ({
+  node_id,
+  page,
+  per_page,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = addQueryParams({
     originalUrl: `${host}/users/${id}/nodes/${node_id}/statements`,
     page,
-    per_page
+    per_page,
   });
 
   return axios.get(url, { headers });
@@ -225,13 +254,20 @@ module.exports[getTransaction] = ({ node_id, trans_id, userInfo }) => {
   return axios.get(url, { headers });
 };
 
-module.exports[getAllNodeTransactions] = ({ node_id, trans_id, page, per_page, filter, userInfo }) => {
+module.exports[getAllNodeTransactions] = ({
+  node_id,
+  trans_id,
+  page,
+  per_page,
+  filter,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = addQueryParams({
     originalUrl: `${host}/users/${id}/nodes/${node_id}/trans`,
     page,
     per_page,
-    filter
+    filter,
   });
 
   return axios.get(url, { headers });
@@ -244,14 +280,24 @@ module.exports[deleteTransaction] = ({ node_id, trans_id, userInfo }) => {
   return axios.delete(url, { headers });
 };
 
-module.exports[commentOnStatus] = ({ node_id, trans_id, bodyParams, userInfo }) => {
+module.exports[commentOnStatus] = ({
+  node_id,
+  trans_id,
+  bodyParams,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = `${host}/users/${id}/nodes/${node_id}/trans/${trans_id}`;
 
   return axios.patch(url, bodyParams, { headers });
 };
 
-module.exports[disputeCardTransaction] = ({ node_id, trans_id, bodyParams, userInfo }) => {
+module.exports[disputeCardTransaction] = ({
+  node_id,
+  trans_id,
+  bodyParams,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = `${host}/users/${id}/nodes/${node_id}/trans/${trans_id}/dispute`;
 
@@ -263,19 +309,24 @@ module.exports[getAllSubnets] = ({ node_id, page, per_page, userInfo }) => {
   const url = addQueryParams({
     originalUrl: `${host}/users/${id}/nodes/${node_id}/subnets`,
     page,
-    per_page
+    per_page,
   });
 
   return axios.get(url, { headers });
 };
 
-module.exports[getSubnet] = ({ node_id, subnet_id, full_dehydrate, userInfo }) => {
+module.exports[getSubnet] = ({
+  node_id,
+  subnet_id,
+  full_dehydrate,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   let url = `${host}/users/${id}/nodes/${node_id}/subnets/${subnet_id}`;
   if (full_dehydrate) {
     url = addQueryParams({
       originalUrl: url,
-      full_dehydrate: 'yes',
+      full_dehydrate: "yes",
     });
   }
 
@@ -289,7 +340,12 @@ module.exports[createSubnet] = ({ node_id, bodyParams, userInfo }) => {
   return axios.post(url, bodyParams, { headers });
 };
 
-module.exports[updateSubnet] = ({ node_id, subnet_id, bodyParams, userInfo }) => {
+module.exports[updateSubnet] = ({
+  node_id,
+  subnet_id,
+  bodyParams,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
   const url = `${host}/users/${id}/nodes/${node_id}/subnets/${subnet_id}`;
 
@@ -309,7 +365,7 @@ module.exports[registerNewFingerprint] = ({ refresh_token, userInfo }) => {
   return axios.post(
     `${host}/oauth/${id}`,
     {
-      refresh_token
+      refresh_token,
     },
     { headers }
   );
@@ -322,20 +378,24 @@ module.exports[supplyDevice2FA] = ({ device, refresh_token, userInfo }) => {
     `${host}/oauth/${id}`,
     {
       refresh_token,
-      "phone_number": device
+      phone_number: device,
     },
     { headers }
   );
 };
 
-module.exports[verifyFingerprint2FA] = ({ validation_pin, refresh_token, userInfo }) => {
+module.exports[verifyFingerprint2FA] = ({
+  validation_pin,
+  refresh_token,
+  userInfo,
+}) => {
   const { host, headers, id } = userInfo;
 
   return axios.post(
     `${host}/oauth/${id}`,
     {
       refresh_token,
-      validation_pin
+      validation_pin,
     },
     { headers }
   );
