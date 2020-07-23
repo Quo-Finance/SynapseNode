@@ -17,6 +17,7 @@ const {
   resetCardNode,
   verifyMicroDeposits,
   reinitiateMicroDeposits,
+  reauthACHNode,
   updateNode,
   deleteNode,
   generateApplePayToken,
@@ -35,31 +36,27 @@ const {
   supplyDevice2FA,
   verifyFingerprint2FA,
   getUser,
-  updateIpAddress
-} = require('../constants/apiReqNames');
+  updateIpAddress,
+} = require("../constants/apiReqNames");
 
-const apiRequests = require('../apiReqs/apiRequests');
-const buildHeaders = require('../helpers/buildHeaders');
+const apiRequests = require("../apiReqs/apiRequests");
+const buildHeaders = require("../helpers/buildHeaders");
 
 class User {
-  constructor({
-    data,
-    headerObj,
-    client
-  }) {
+  constructor({ data, headerObj, client }) {
     this.id = data._id;
     this.body = data;
     this.host = client.host;
     this.fingerprint = headerObj.fingerprint;
     this.ip_address = headerObj.ip_address;
-    this.oauth_key = '';
+    this.oauth_key = "";
     this.client = client;
     this.headers = buildHeaders({
       client_id: client.client_id,
       client_secret: client.client_secret,
       fingerprint: this.fingerprint,
       ip_address: this.ip_address,
-      oauth_key: this.oauth_key
+      oauth_key: this.oauth_key,
     });
   }
 
@@ -67,7 +64,7 @@ class User {
   addUserKyc(bodyParams = {}) {
     return apiRequests.user[addUserKyc]({
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -75,7 +72,7 @@ class User {
   deleteExistingDocument(bodyParams = {}) {
     return apiRequests.user[deleteExistingDocument]({
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -83,7 +80,7 @@ class User {
   updateUser(bodyParams = {}) {
     return apiRequests.user[updateUser]({
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -91,11 +88,10 @@ class User {
   _grabRefreshToken() {
     return apiRequests.client[getUser]({
       user_id: this.id,
-      full_dehydrate: 'no',
+      full_dehydrate: "no",
       headers: this.headers,
-      clientInfo: this.client
-    })
-    .then(({ data }) => {
+      clientInfo: this.client,
+    }).then(({ data }) => {
       return data.refresh_token;
     });
   }
@@ -104,9 +100,8 @@ class User {
   _oauthUser(bodyParams = {}) {
     return apiRequests.user[_oauthUser]({
       bodyParams,
-      userInfo: this
-    })
-    .then(({ data }) => {
+      userInfo: this,
+    }).then(({ data }) => {
       this.oauth_key = data.oauth_key;
 
       this.headers = buildHeaders({
@@ -114,7 +109,7 @@ class User {
         client_secret: this.client.client_secret,
         fingerprint: this.fingerprint,
         ip_address: this.ip_address,
-        oauth_key: this.oauth_key
+        oauth_key: this.oauth_key,
       });
 
       return data;
@@ -130,13 +125,13 @@ class User {
         fingerprint: this.fingerprint,
         ip_address: this.ip_address,
         oauth_key: this.oauth_key,
-        idempotency_key
+        idempotency_key,
       });
     }
 
     return apiRequests.user[createNode]({
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -150,14 +145,14 @@ class User {
         fingerprint: this.fingerprint,
         ip_address: this.ip_address,
         oauth_key: this.oauth_key,
-        idempotency_key
+        idempotency_key,
       });
     }
 
     return apiRequests.user[verifyAchMfa]({
       access_token,
       mfa_answer,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -169,7 +164,7 @@ class User {
       page,
       per_page,
       type,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -181,7 +176,7 @@ class User {
       node_id,
       full_dehydrate,
       force_refresh,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -193,13 +188,19 @@ class User {
       page,
       per_page,
       filter,
-      userInfo: this
+      userInfo: this,
     });
   }
 
   // GET TRIGGER DUMMY TRANSACTIONS
   triggerDummyTransactions(node_id, queryParams = {}) {
-    const { amount, foreign_transaction, is_credit, subnet_id, type } = queryParams;
+    const {
+      amount,
+      foreign_transaction,
+      is_credit,
+      subnet_id,
+      type,
+    } = queryParams;
 
     return apiRequests.user[triggerDummyTransactions]({
       node_id,
@@ -208,7 +209,7 @@ class User {
       is_credit,
       subnet_id,
       type,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -216,7 +217,7 @@ class User {
   generateUboForm(bodyParams) {
     return apiRequests.user[generateUboForm]({
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -227,7 +228,7 @@ class User {
     return apiRequests.user[getStatementsByUser]({
       page,
       per_page,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -239,7 +240,7 @@ class User {
       node_id,
       page,
       per_page,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -248,7 +249,7 @@ class User {
     return apiRequests.user[shipDebitCard]({
       node_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -256,7 +257,7 @@ class User {
   resetCardNode(node_id) {
     return apiRequests.user[resetDebitCard]({
       node_id,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -265,7 +266,7 @@ class User {
     return apiRequests.user[verifyMicroDeposits]({
       node_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -273,7 +274,15 @@ class User {
   reinitiateMicroDeposits(node_id) {
     return apiRequests.user[reinitiateMicroDeposits]({
       node_id,
-      userInfo: this
+      userInfo: this,
+    });
+  }
+
+  // PATCH REAUTHENTICATE ACH NODE
+  reauthACHNode(node_id) {
+    return apiRequests.user[reauthACHNode]({
+      node_id,
+      userInfo: this,
     });
   }
 
@@ -282,7 +291,7 @@ class User {
     return apiRequests.user[updateNode]({
       node_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -290,7 +299,7 @@ class User {
   deleteNode(node_id) {
     return apiRequests.user[deleteNode]({
       node_id,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -299,7 +308,7 @@ class User {
     return apiRequests.user[generateApplePayToken]({
       node_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -312,14 +321,14 @@ class User {
         fingerprint: this.fingerprint,
         ip_address: this.ip_address,
         oauth_key: this.oauth_key,
-        idempotency_key
+        idempotency_key,
       });
     }
 
     return apiRequests.user[createTransaction]({
       node_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -328,7 +337,7 @@ class User {
     return apiRequests.user[getTransaction]({
       node_id,
       trans_id,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -341,7 +350,7 @@ class User {
       page,
       per_page,
       filter,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -350,7 +359,7 @@ class User {
     return apiRequests.user[deleteTransaction]({
       node_id,
       trans_id,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -360,7 +369,7 @@ class User {
       node_id,
       trans_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -370,7 +379,7 @@ class User {
       node_id,
       trans_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -382,7 +391,7 @@ class User {
       node_id,
       page,
       per_page,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -393,7 +402,7 @@ class User {
       node_id,
       subnet_id,
       full_dehydrate,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -406,14 +415,14 @@ class User {
         fingerprint: this.fingerprint,
         ip_address: this.ip_address,
         oauth_key: this.oauth_key,
-        idempotency_key
+        idempotency_key,
       });
     }
 
     return apiRequests.user[createSubnet]({
       node_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -423,17 +432,17 @@ class User {
       node_id,
       subnet_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
   // PATCH SHIP CARD SUBNET
-  shipCard(node_id, subnet_id, bodyParams ={}) {
+  shipCard(node_id, subnet_id, bodyParams = {}) {
     return apiRequests.user[shipCard]({
       node_id,
       subnet_id,
       bodyParams,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -447,12 +456,12 @@ class User {
       client_secret: this.client.client_secret,
       fingerprint: this.fingerprint,
       ip_address: this.ip_address,
-      oauth_key: this.oauth_key
+      oauth_key: this.oauth_key,
     });
 
     return apiRequests.user[registerNewFingerprint]({
       refresh_token,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -466,13 +475,13 @@ class User {
       client_secret: this.client.client_secret,
       fingerprint: this.fingerprint,
       ip_address: this.ip_address,
-      oauth_key: this.oauth_key
+      oauth_key: this.oauth_key,
     });
 
     return apiRequests.user[supplyDevice2FA]({
       device,
       refresh_token,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -486,13 +495,13 @@ class User {
       client_secret: this.client.client_secret,
       fingerprint: this.fingerprint,
       ip_address: this.ip_address,
-      oauth_key: this.oauth_key
+      oauth_key: this.oauth_key,
     });
 
     return apiRequests.user[verifyFingerprint2FA]({
       validation_pin,
       refresh_token,
-      userInfo: this
+      userInfo: this,
     });
   }
 
@@ -504,7 +513,7 @@ class User {
       client_secret: this.client.client_secret,
       fingerprint: this.fingerprint,
       ip_address: this.ip_address,
-      oauth_key: this.oauth_key
+      oauth_key: this.oauth_key,
     });
     return this.headers;
   }

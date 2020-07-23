@@ -27,6 +27,7 @@ module.exports = {
   shipCardNode: "shipCardNode",
   resetCardNode: "resetCardNode",
   verifyMicroDeposits: "verifyMicroDeposits",
+  reauthACHNode: "reauthACHNode",
   reinitiateMicroDeposits: "reinitiateMicroDeposits",
   updateNode: "updateNode",
   deleteNode: "deleteNode",
